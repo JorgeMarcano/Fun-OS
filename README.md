@@ -19,10 +19,25 @@ regdump
 	dumps register data 
 	used mostly for debugging
 	
-put XXXX YY
-
-	puts byte of data in memory location XXXX (hex, 0 padded)
-	
 clear 
 
 	clears the screen
+	
+dsk 
+
+    prints a list of all disks available
+	
+mnt XX 
+
+    Sets a specific disk as the current working disk
+	if FAT16, will load boot record and print "detected fat16"
+	
+ls
+
+	list files and folders in current location
+	
+cd %s
+
+	change working directory
+	
+

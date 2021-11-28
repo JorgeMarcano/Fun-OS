@@ -7,6 +7,8 @@ cmd_shutdown:	db 'shutdown', 0x00
 cmd_help:	db 'help', 0x00
 cmd_regdump:	db 'regdump', 0x00
 cmd_clear:	db 'clear', 0x00
+cmd_list_dsk:	db 'dsk', 0x00
+cmd_mnt:	db 'mnt', 0x00
 
 ; si contains buffer
 ; cx contains maximum size
@@ -56,6 +58,24 @@ not_cmd_help:
 
 not_cmd_regdump:
 
+	mov di, cmd_list_dsk
+	call cmp_str
+	cmp al, bl
+	je not_cmd_list_dsk
+	call list_dsk_c
+	jmp end_handle_cmd
+
+not_cmd_list_dsk:
+
+	mov di, cmd_mnt
+	call cmp_substr
+	cmp al, bl
+	je not_cmd_mnt
+	call mnt_c
+	jmp end_handle_cmd
+
+not_cmd_mnt:
+
 	jmp handle_cmd_error
 
 handle_print_cmd:
@@ -94,5 +114,6 @@ include 'string.asm'
 include 'hexdump.asm'
 include 'help.asm'
 include 'regdump.asm'
+include 'file.asm'
 
 cmd_skip_newl:	db 0x00

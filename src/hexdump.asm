@@ -1,6 +1,6 @@
 CMD_HEXDUMP_LEN	equ	8
 
-;si contains command string
+; si contains command string
 ; Proper syntax is 'hexdump XXXX xx'
 hexdump_c:
 	pusha
