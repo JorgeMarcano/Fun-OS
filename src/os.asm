@@ -1,5 +1,7 @@
 org 0x0000
 
+KERNEL_SEG	equ 0x1000
+
 db (end_pointer - $$) / 512	; Should contain how many sectors this OS is
 
 	jmp main			; Jumps to start address of OS

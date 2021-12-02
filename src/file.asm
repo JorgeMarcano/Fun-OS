@@ -5,6 +5,8 @@ current_drive_index:	db 0x00
 
 CMD_MNT_LEN	equ	3
 
+DRIVE_SEG	equ	0x2000	;segment for drives
+
 ; dl contains drive to query
 print_drive_info:
 	ret
@@ -159,10 +161,37 @@ mnt_c:
 	int 0x13
 	jc error_mnt_c
 
-	pop ax
+	pop ax				; Drive exists, must get Boot Record
 	mov [current_drive_index], al
 	mov si, mnt_c_success_msg
 	call print_str_null
+	call print_hex_char
+	call print_newl
+
+	mov bx, DRIVE_SEG
+	mov es, bx
+	xor bx, bx
+	mov ax, 0x0201			; Read first sector (boot record)
+	mov cx, 0x0001
+	mov dx, bx
+	int 0x13
+
+	jc error_read_mnt_c
+	cmp al, 0x01
+	jne error_read_mnt_c
+
+	mov si, mnt_c_boot_rec_succ_msg
+	call print_str_null
+	xor si, si
+	mov cx, 0x0020			; Print 32 lines of 16 bytes (512B)
+	call print_hex_arr
+
+	jmp end_mnt_c
+
+error_read_mnt_c:
+	mov si, mnt_c_boot_rec_error_msg
+	call print_str_null
+	mov al, ah
 	call print_hex_char
 	jmp end_mnt_c
 
@@ -189,5 +218,7 @@ get_drive_info_cyl_msg:		db ' |- Cylinders: 0x', 0x00
 get_drive_info_sec_msg:		db ' |- Sectors: 0x', 0x00
 get_drive_info_head_msg:	db ' |- Heads: 0x', 0x00
 
-mnt_c_error_msg:		db 'Failed to mount 0x', 0x00
-mnt_c_success_msg:		db 'Successfully mounted 0x', 0x00
+mnt_c_error_msg:		db 'Failed to find 0x', 0x00
+mnt_c_success_msg:		db 'Successfully found 0x', 0x00
+mnt_c_boot_rec_error_msg:	db 'Failed to find format, error 0x', 0x00
+mnt_c_boot_rec_succ_msg:	db 'Successfully loaded format', 0x00

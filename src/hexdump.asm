@@ -33,6 +33,8 @@ hexdump_c:
 	jne error_hexdump_c
 
 	mov si, bx
+	mov cx, KERNEL_SEG
+	mov es, cx
 	xor cx, cx
 	mov cl, al
 	call print_hex_arr
@@ -89,7 +91,7 @@ end_parse_hex_byte:
 	pop bx
 	ret
 
-; si contains start byte to print
+; es:si contains start byte to print
 ; cx contains number of lines (max 256)
 print_hex_arr:
 	pusha
@@ -119,10 +121,10 @@ break_line_loop_print_hex_arr:	; Finished a line, must enter next line and print
 	mov bx, 0x008
 
 loop_print_hex_arr:
-	mov al, [si]
+	mov al, [es:si]
 	call print_hex_char
 	inc si
-	mov al, [si]
+	mov al, [es:si]
 	call print_hex_char
 	inc si
 	mov al, ' '
